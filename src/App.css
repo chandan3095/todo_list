@@ -1,0 +1,32 @@
+.search_inputField {
+  display: flex;
+  justify-content: end;
+}
+.search_inputField input {
+  padding: 0.5rem 0;
+}
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td,
+th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+.add_todo_value {
+  border-radius: 34px;
+  border: 1px solid #7c7a7a;
+}
+#editedName,
+#editedDate,
+#editedTime {
+  margin: 0 0.3rem;
+}

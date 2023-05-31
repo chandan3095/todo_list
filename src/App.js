@@ -13,11 +13,16 @@ const App = () => {
   };
   const [addValue, setAddValue] = useState(initialValues); //task name value
   const [data, setData] = useState([]);
-  const [edit, setEdit] = useState("");
+  const [edit, setEdit] = useState(initialValues);
 
   const [editModal, setEditModal] = useState(false);
   const closeEditModal = () => setEditModal(false);
   const showEditModal = () => setEditModal(true);
+
+  const [deleteModal, setDeleteModal] = useState(false);
+  const closeDeleteModal = () => setDeleteModal(false);
+  const showDeleteModal = () => setDeleteModal(true);
+  const [deletedState, setDeletedState] = useState(null);
 
   const [datePicker, setDatePicker] = useState(false);
   const closeDatePicker = () => setDatePicker(false);
@@ -27,6 +32,7 @@ const App = () => {
   const closeTimePicker = () => setTimePicker(false);
   const showTimePicker = () => setTimePicker(true);
 
+  console.log({ data });
   const showDatePickerModal = () => {
     showDatePicker();
   };
@@ -40,18 +46,41 @@ const App = () => {
 
   const addTableValue = () => {
     closeTimePicker();
-    setData([...data, addValue]);
+    data.sort((a, b) => a.date - b.date);
+    setData([...data, { ...addValue, id: Date.now() }]);
     toast.success("Task Added in the List");
     setAddValue(initialValues);
   };
-
+  const handleEdit = (e) => {
+    setEdit({ ...edit, [e.target.name]: e.target.value });
+  };
   const forEdit = (item) => {
+    console.log(item);
     showEditModal();
-    setAddValue(item);
+    setEdit(item);
   };
 
-  console.log(addValue, "add");
+  const editedValue = () => {
+    closeEditModal();
+    console.log(edit);
+    const newEditedData =
+      data &&
+      data.map((item, index) => {
+        if (item.id === edit.id) {
+          return edit;
+        } else {
+          return item;
+        }
+      });
+    setData(newEditedData);
+  };
 
+  const deletedValue = () => {
+    closeDeleteModal();
+    setData((current) => {
+      return current.filter((data) => data.id !== deletedState);
+    });
+  };
   return (
     <div className="App">
       <Container>
@@ -84,7 +113,13 @@ const App = () => {
                         <AiFillEdit size={20} />
                       </button>
 
-                      <button className="mx-1 btn btn-danger px-3">
+                      <button
+                        className="mx-1 btn btn-danger px-3"
+                        onClick={() => {
+                          showDeleteModal();
+                          setDeletedState(item.id);
+                        }}
+                      >
                         <AiFillDelete size={20} />
                       </button>
                     </td>
@@ -171,30 +206,30 @@ const App = () => {
       {/* edit modal  */}
       <Modal show={editModal} onHide={closeEditModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Select Time</Modal.Title>
+          <Modal.Title>Edit</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="d-flex">
             <input
               type="text"
-              name="editedName"
+              name="taskName"
               id="editedName"
-              value={addValue.taskName}
-              onChange={(e) => e.target.value}
+              value={edit.taskName}
+              onChange={handleEdit}
             />
             <input
               type="date"
-              name="editedDate"
+              name="date"
               id="editedDate"
-              value={addValue.date}
-              onChange={(e) => e.target.value}
+              value={edit.date}
+              onChange={handleEdit}
             />
             <input
               type="time"
-              name="editedTime"
+              name="time"
               id="editedTime"
-              value={addValue.time}
-              onChange={(e) => e.target.value}
+              value={edit.time}
+              onChange={handleEdit}
             />
           </div>
         </Modal.Body>
@@ -202,12 +237,33 @@ const App = () => {
           <Button variant="secondary" onClick={closeEditModal}>
             Close
           </Button>
-          <Button variant="primary" onClick={closeEditModal}>
+          <Button variant="primary" onClick={() => editedValue()}>
             Save Changes
           </Button>
         </Modal.Footer>
       </Modal>
       {/* edit modal  */}
+
+      {/* delete modal  */}
+      <Modal show={deleteModal} onHide={closeDeleteModal}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="d-flex justify-content-center align-items-center">
+            <AiFillDelete size={200} color="red" />
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeDeleteModal}>
+            Close
+          </Button>
+          <Button variant="danger" onClick={() => deletedValue()}>
+            Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+      {/* delete modal  */}
       <ToastContainer />
     </div>
   );
